@@ -1,0 +1,54 @@
+{
+    "name": "resohead/laravel-test-mail",
+    "description": "Quickly send test emails using commands in Laravel applications",
+    "keywords": [
+        "resohead",
+        "laravel-test-mail"
+    ],
+    "homepage": "https://github.com/resohead/laravel-test-mail",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Sean White",
+            "email": "s.white9904@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "illuminate/support": "^6.0|^7.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^4.0",
+        "phpunit/phpunit": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Resohead\\LaravelTestMail\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Resohead\\LaravelTestMail\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Resohead\\LaravelTestMail\\LaravelTestMailServiceProvider"
+            ],
+            "aliases": {
+                "LaravelTestMail": "Resohead\\LaravelTestMail\\LaravelTestMailFacade"
+            }
+        }
+    }
+}
