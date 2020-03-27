@@ -4,7 +4,7 @@ namespace Resohead\LaravelTestMail\Tests;
 
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Mail;
-use Resohead\LaravelTestMail\TestMail;
+use Resohead\LaravelTestMail\TestMailable;
 use Illuminate\Support\Facades\Artisan;
 use Resohead\LaravelTestMail\LaravelTestMailServiceProvider;
 
@@ -45,7 +45,7 @@ class TestMailTest extends TestCase
         $this->assertStringContainsString($this->defaultEmailAddress, Artisan::output());
         $this->assertEquals(0, $exitCode);
 
-        Mail::assertSent(TestMail::class, function (TestMail $mail) {
+        Mail::assertSent(TestMailable::class, function (TestMailable $mail) {
             $mail->build();
             $this->assertCount(1, $mail->to);
             $this->assertEquals($this->emailAddress, $mail->to[0]['address']);
@@ -66,7 +66,7 @@ class TestMailTest extends TestCase
         $this->assertStringContainsString($this->emailAddress, Artisan::output());
         $this->assertEquals(0, $exitCode);
 
-        Mail::assertSent(TestMail::class, function (TestMail $mail) {
+        Mail::assertSent(TestMailable::class, function (TestMailable $mail) {
             $mail->build();
             $this->assertCount(1, $mail->to);
             $this->assertEquals($this->emailAddress, $mail->to[0]['address']);
@@ -89,7 +89,7 @@ class TestMailTest extends TestCase
         $this->assertStringContainsString($this->emailAddress, Artisan::output());
         $this->assertEquals(0, $exitCode);
 
-        Mail::assertQueued(TestMail::class, function (TestMail $mail) {
+        Mail::assertQueued(TestMailable::class, function (TestMailable $mail) {
             $mail->build();
             $this->assertCount(1, $mail->to);
             $this->assertEquals($this->emailAddress, $mail->to[0]['address']);
@@ -110,7 +110,7 @@ class TestMailTest extends TestCase
         $this->assertStringContainsString($this->emailAddress, Artisan::output());
         $this->assertEquals(0, $exitCode);
 
-        Mail::assertQueued(TestMail::class, function (TestMail $mail) {
+        Mail::assertQueued(TestMailable::class, function (TestMailable $mail) {
             $mail->build();
             $this->assertEquals('emails', $mail->queue);
             $this->assertCount(1, $mail->to);
@@ -132,7 +132,7 @@ class TestMailTest extends TestCase
         $this->assertStringContainsString($this->emailAddress, Artisan::output());
         $this->assertEquals(0, $exitCode);
 
-        Mail::assertQueued(TestMail::class, function (TestMail $mail) {
+        Mail::assertQueued(TestMailable::class, function (TestMailable $mail) {
             $mail->build();
             $this->assertEquals('sync', $mail->connection);
             $this->assertCount(1, $mail->to);
@@ -155,7 +155,7 @@ class TestMailTest extends TestCase
         $this->assertStringContainsString($this->emailAddress, Artisan::output());
         $this->assertEquals(0, $exitCode);
 
-        Mail::assertQueued(TestMail::class, function (TestMail $mail) {
+        Mail::assertQueued(TestMailable::class, function (TestMailable $mail) {
             $mail->build();
             $this->assertEquals('emails', $mail->queue);
             $this->assertEquals('sync', $mail->connection);
@@ -180,7 +180,7 @@ class TestMailTest extends TestCase
         $this->assertStringContainsString($this->emailAddress, Artisan::output());
         $this->assertEquals(0, $exitCode);
 
-        Mail::assertQueued(TestMail::class, function (TestMail $mail) {
+        Mail::assertQueued(TestMailable::class, function (TestMailable $mail) {
             $mail->build();
             $this->assertEquals('emails', $mail->queue);
             $this->assertEquals('sync', $mail->connection);
@@ -200,7 +200,7 @@ class TestMailTest extends TestCase
             'recipient' => 'notanemailaddress',
         ]);
 
-        Mail::assertNotSent(TestMail::class);
+        Mail::assertNotSent(TestMailable::class);
 
         $this->assertEquals(1, $exitCode);
     }
@@ -215,7 +215,7 @@ class TestMailTest extends TestCase
             'recipient' => 'notanemailaddress',
         ]);
 
-        Mail::assertNotQueued(TestMail::class);
+        Mail::assertNotQueued(TestMailable::class);
 
         $this->assertEquals(1, $exitCode);
     }
@@ -246,7 +246,7 @@ class TestMailTest extends TestCase
 
         $this->assertStringContainsString('The driver field is required.', Artisan::output());
 
-        Mail::assertNotSent(TestMail::class);
+        Mail::assertNotSent(TestMailable::class);
 
         $this->assertEquals(1, $exitCode);
     }
@@ -269,7 +269,7 @@ class TestMailTest extends TestCase
         $this->assertStringContainsString('The email must be a valid email address.', $output);
         $this->assertStringContainsString('The driver field is required.', $output);
 
-        Mail::assertNotSent(TestMail::class);
+        Mail::assertNotSent(TestMailable::class);
 
         $this->assertEquals(1, $exitCode);
     }

@@ -4,9 +4,9 @@ namespace Resohead\LaravelTestMail;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
-use Resohead\LaravelTestMail\TestMail;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Support\Facades\Validator;
+use Resohead\LaravelTestMail\TestMailable;
 use Resohead\LaravelTestMail\SendTestEmailJob;
 use \Illuminate\Contracts\Config\Repository as Config;
 
@@ -17,7 +17,7 @@ class TestMailCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'mail:test {recipient?} {--driver=} {--queue} {--stack=} {--connection=}';
+    protected $signature = 'mail:test {recipient?} {--queue} {--driver=} {--connection=} {--stack=}';
 
     /**
      * The console command description.
@@ -28,6 +28,12 @@ class TestMailCommand extends Command
 
     protected $validator;
     protected $config;
+
+    protected $recipient;
+    protected $driver;
+    protected $stack;
+    protected $connection;
+
     /**
      * Create a new command instance.
      *
@@ -47,14 +53,11 @@ class TestMailCommand extends Command
      */
     public function handle()
     {
-        $recipient = $this->argument('recipient') ?? config('mail.from.address');
-        $driver = $this->option('driver') ?? $this->config->get('mail.driver');
-        $stack = $this->option('stack') ?: 'default';
-        $connection = $this->option('connection') ?? $this->config->get('queue.default');
+        $this->getArgumentsWithDefaults();
         
         $validation = $this->validator::make([
-                'email' => $recipient,
-                'driver' => $driver
+                'email' => $this->recipient,
+                'driver' => $this->driver
             ], $this->rules()
         );
 
@@ -65,18 +68,31 @@ class TestMailCommand extends Command
             return 1;
         }
         
-        $this->config->set('mail.driver', $driver);
+        $this->config->set('mail.driver', $this->driver);
         
-        $mailable = new TestMail($recipient);
+        $mailable = new TestMailable($this->recipient);
 
-        (bool) $this->option('queue') || ($this->option('stack') || $this->option('connection'))
-            ? Mail::queue($mailable->onConnection($connection)->onQueue($stack)) 
+        $this->isOnQueue()
+            ? Mail::queue($mailable->onConnection($this->connection)->onQueue($this->stack)) 
             : Mail::send($mailable);
-        
-        $this->comment("A test email (${driver}) has been sent to ${recipient}");
+            
+        $this->comment("A test email ($this->driver) has been sent to $this->recipient");
     }
 
-    protected function rules()
+    protected function getArgumentsWithDefaults()
+    {
+        $this->recipient = $this->argument('recipient') ?? $this->config->get('mail.from.address');
+        $this->driver = $this->option('driver') ?? $this->config->get('mail.driver');
+        $this->connection = $this->option('connection') ?? $this->config->get('queue.default');
+        $this->stack = $this->option('stack') ?: 'default';
+    }
+
+    protected function isOnQueue(): bool
+    {
+        return $this->option('queue') || $this->option('stack') || $this->option('connection');
+    }
+
+    protected function rules(): array
     {
         return [
             'email' => 'email',

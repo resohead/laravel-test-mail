@@ -5,7 +5,7 @@
 [![Quality Score](https://img.shields.io/scrutinizer/g/resohead/laravel-test-mail.svg?style=flat-square)](https://scrutinizer-ci.com/g/resohead/laravel-test-mail)
 [![Total Downloads](https://img.shields.io/packagist/dt/resohead/laravel-test-mail.svg?style=flat-square)](https://packagist.org/packages/resohead/laravel-test-mail)
 
-A simple package to send test emails from artisan commands.
+A simple package to send test emails from artisan commands in Laravel applications. Ideal for checking mail and queue configurations.
 
 ## Installation
 
