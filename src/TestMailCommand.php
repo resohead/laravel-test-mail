@@ -17,7 +17,7 @@ class TestMailCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'mail:test {recipient?} {--queue} {--driver=} {--connection=} {--stack=}';
+    protected $signature = 'mail:test {recipient?} {--preset=} {--queue} {--driver=} {--connection=} {--stack=}';
 
     /**
      * The console command description.
@@ -29,6 +29,7 @@ class TestMailCommand extends Command
     protected $validator;
     protected $config;
 
+    protected $preset;
     protected $recipient;
     protected $driver;
     protected $stack;
@@ -53,11 +54,12 @@ class TestMailCommand extends Command
      */
     public function handle()
     {
-        $this->getArgumentsWithDefaults();
-        
+        $this->setArgumentDefaults();
+
         $validation = $this->validator::make([
                 'email' => $this->recipient,
-                'driver' => $this->driver
+                'driver' => $this->driver,
+                'preset' => $this->preset
             ], $this->rules()
         );
 
@@ -69,7 +71,7 @@ class TestMailCommand extends Command
         }
         
         $this->config->set('mail.driver', $this->driver);
-        
+
         $mailable = new TestMailable($this->recipient);
 
         $this->isOnQueue()
@@ -79,24 +81,84 @@ class TestMailCommand extends Command
         $this->comment("A test email ($this->driver) has been sent to $this->recipient");
     }
 
-    protected function getArgumentsWithDefaults()
+    protected function setArgumentDefaults()
     {
-        $this->recipient = $this->argument('recipient') ?? $this->config->get('mail.from.address');
-        $this->driver = $this->option('driver') ?? $this->config->get('mail.driver');
-        $this->connection = $this->option('connection') ?? $this->config->get('queue.default');
-        $this->stack = $this->option('stack') ?: 'default';
+        $this->setPreset();
+        $this->setRecipient();
+        $this->setDriver();
+        $this->setConnection();
+        $this->setStack();
+    }
+
+    protected function getPresetValue($key, $default = null)
+    {
+        return $this->config->get(
+                implode('.', [$this->getConfigPath(), $this->preset, $key]), 
+                $default
+            );
+    }
+
+    protected function getConfigPath()
+    {
+        return 'mail-test.presets';
+    }
+
+    protected function getConfigKeys()
+    {
+        return array_keys(
+            $this->config->get($this->getConfigPath())
+        );
+    }
+
+    protected function setPreset()
+    {
+        $this->preset = $this->option('preset');
+    }
+
+    protected function setRecipient()
+    {
+        $this->recipient = $this->argument('recipient') ??
+             $this->getPresetValue('recipient', $this->config->get('mail.from.address'));
+    }
+
+    protected function setDriver()
+    {
+        $this->driver = $this->option('driver') ?? 
+            $this->getPresetValue('driver', $this->config->get('mail.driver'));
+    }
+
+    protected function setConnection()
+    {
+        $this->connection = $this->option('connection') ?? 
+            $this->getPresetValue('connection', $this->config->get('queue.default'));
+    }
+
+    protected function setStack()
+    {
+        $this->stack = $this->option('stack') ?: $this->getPresetValue('stack', 'default');
     }
 
     protected function isOnQueue(): bool
     {
+        return $this->hasQueueOptions() || $this->hasQueuePresets();
+    }
+
+    protected function hasQueueOptions()
+    {
         return $this->option('queue') || $this->option('stack') || $this->option('connection');
+    }
+
+    protected function hasQueuePresets()
+    {
+        return $this->getPresetValue('queue') || $this->getPresetValue('connection') || $this->getPresetValue('stack');
     }
 
     protected function rules(): array
     {
         return [
             'email' => 'email',
-            'driver' => 'required'
+            'driver' => 'required',
+            'preset' => 'nullable|sometimes|in:'.implode(',', $this->getConfigKeys()),
         ];
     }
 }

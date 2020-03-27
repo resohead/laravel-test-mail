@@ -3,6 +3,7 @@
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/resohead/laravel-test-mail.svg?style=flat-square)](https://packagist.org/packages/resohead/laravel-test-mail)
 [![Build Status](https://img.shields.io/travis/resohead/laravel-test-mail/master.svg?style=flat-square)](https://travis-ci.org/resohead/laravel-test-mail)
 [![Quality Score](https://img.shields.io/scrutinizer/g/resohead/laravel-test-mail.svg?style=flat-square)](https://scrutinizer-ci.com/g/resohead/laravel-test-mail)
+[![Maintainability](https://api.codeclimate.com/v1/badges/ddf2b91c4d6c595d6ff0/maintainability)](https://codeclimate.com/github/resohead/laravel-test-mail/maintainability)
 [![Total Downloads](https://img.shields.io/packagist/dt/resohead/laravel-test-mail.svg?style=flat-square)](https://packagist.org/packages/resohead/laravel-test-mail)
 
 A simple package to send test emails from artisan commands in Laravel applications. Ideal for checking mail and queue configurations.
@@ -17,7 +18,12 @@ composer require resohead/laravel-test-mail
 
 The package will automatically register itself.
 
-## Usage
+Optionally publish the config file:
+```
+php artisan vendor:publish --provider="Resohead\LaravelTestMail\LaravelTestMailServiceProvider" --tag="config"
+```
+
+## Basic Usage
 
 To send a test email run the following artisan command:
 
@@ -30,11 +36,12 @@ By default this will use:
 - your default mail driver,
 - synchronous processing
 
-Alternatively you have three other options in the command signature: 
+Alternatively you have four other options in the command signature: 
 - set the email address,
 - change the mail driver,
 - enable for queuing
 - change the queue connection
+- select the preset
 
 Changing the mail driver and running through a queue might require the queue worker to be reset.
 
@@ -59,6 +66,40 @@ php artisan mail:test name@example.com --driver=smtp --connection=redis --stack=
 ```
 php artisan queue:work sqs
 ```
+
+## Presets
+
+You can also configure presets to help group command options.
+
+> Not all command arguments are required in the preset array. Config will be merged with defaults
+
+```
+'presets' => [
+
+        // call: mail:test --preset=example1
+        // same as: mail:test preset1@example.com
+        'example1' => [
+            'recipient' => 'preset1@example.com',
+        ],
+
+        // same as: mail:test --driver=log --stack=emails
+        'example2' => [
+            'driver' => 'log',
+            'stack' => 'emails'
+        ],
+
+        // or override all options
+        'example3' => [
+            'recipient' => env('EMAIL_TO', 'preset3@example.com'),
+            'driver' => 'smtp',
+            'connection' => 'redis',
+            'stack' => 'emails'
+        ],
+
+    ]
+```
+
+
 ## Alternatives
 
 This is a simple package designed to quickly trigger an email to check your configuration. 
