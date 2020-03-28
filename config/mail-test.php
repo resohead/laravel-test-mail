@@ -7,17 +7,18 @@ return [
     | Mail Test: Presets
     |--------------------------------------------------------------------------
     |
-    | Laravel supports both SMTP and PHP's "mail" function as drivers for the
-    | sending of e-mail. You may specify which one you're using throughout
-    | your application here. 
+    | Each preset allows you to group arguments into resuseable sections.
+    | The values defined in each preset will be merged with the command
+    | line values and your default mail/queue configuration.
     |
-    | Supported keys: "recipient", "driver", "connection", "stack"
+    | Supported keys: "recipient", "driver", "connection", "stack", 
+    | "queue" (bool)
     |
     */
     'presets' => [
 
-        // 'example' => [
-        //     'recipient' => env('EMAIL_TO', 'preset2@example.com'),
+        // 'example1' => [
+        //     'recipient' => env('EMAIL_TO', 'preset@example.com'),
         //     'driver' => 'smtp',
         //     'connection' => 'redis',
         //     'stack' => 'emails'

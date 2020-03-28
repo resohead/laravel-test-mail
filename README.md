@@ -1,7 +1,6 @@
 # Laravel Test Mail
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/resohead/laravel-test-mail.svg?style=flat-square)](https://packagist.org/packages/resohead/laravel-test-mail)
-[![Build Status](https://img.shields.io/travis/resohead/laravel-test-mail/master.svg?style=flat-square)](https://travis-ci.org/resohead/laravel-test-mail)
 [![Quality Score](https://img.shields.io/scrutinizer/g/resohead/laravel-test-mail.svg?style=flat-square)](https://scrutinizer-ci.com/g/resohead/laravel-test-mail)
 [![Maintainability](https://api.codeclimate.com/v1/badges/ddf2b91c4d6c595d6ff0/maintainability)](https://codeclimate.com/github/resohead/laravel-test-mail/maintainability)
 [![Total Downloads](https://img.shields.io/packagist/dt/resohead/laravel-test-mail.svg?style=flat-square)](https://packagist.org/packages/resohead/laravel-test-mail)
@@ -43,62 +42,100 @@ Alternatively you have four other options in the command signature:
 - change the queue connection
 - select the preset
 
-Changing the mail driver and running through a queue might require the queue worker to be reset.
+> Changing the mail driver and running through a queue might require the queue worker to be started/reset.
 
-``` bash
-// send using the default mail driver and default queue/stack to the specified email
-php artisan mail:test name@example.com --queue
+## Command Line Options
 
-// queue using the 'log' mail driver
-php artisan mail:test --driver=log
-
-// queue using the 'emails' queue on the default connection
-php artisan mail:test --stack=emails
-
-// queue using the sqs queue connection, default queue and default mail driver
-php artisan mail:test --connection=sqs
-
-// send a test mail using the SMTP driver via the emails queue on the redis connection 
-php artisan mail:test name@example.com --driver=smtp --connection=redis --stack=emails
-
+### Send to specified email
 ```
+php artisan mail:test name@example.com
+```
+
+### Send to specified email on default queue
+```
+php artisan mail:test name@example.com --queue
+```
+
+### Send via log driver 
+```
+php artisan mail:test --driver=log
+```
+
+### Send to the 'emails' queue on default connection 
+```
+php artisan mail:test --stack=emails
+```
+> There is no need to set the --queue flag when using the stack argument
+
+### Send using 'sqs' queue connection
+```
+php artisan mail:test --connection=sqs
+```
+> There is no need to set the --queue flag when using the connection argument
+
+### Send using the SMTP driver via the 'emails' queue on the 'redis' connection 
+```
+php artisan mail:test name@example.com --driver=smtp --connection=redis --stack=emails
+```
+
+## Queues
 > You might need to start the your queue if using the connection option, for example
 ```
-php artisan queue:work sqs
+php artisan queue:work sqs --queue:emails
 ```
 
 ## Presets
 
-You can also configure presets to help group command options.
+You can also configure presets to group command line options. The values defined in each preset will be merged with the command line values and your default mail and queue configuration.
 
-> Not all command arguments are required in the preset array. Config will be merged with defaults
+### Example config\mail-test.php
 
 ```
 'presets' => [
 
-        // call: mail:test --preset=example1
-        // same as: mail:test preset1@example.com
         'example1' => [
             'recipient' => 'preset1@example.com',
+            'queue' => true
         ],
 
-        // same as: mail:test --driver=log --stack=emails
         'example2' => [
             'driver' => 'log',
             'stack' => 'emails'
         ],
 
-        // or override all options
         'example3' => [
             'recipient' => env('EMAIL_TO', 'preset3@example.com'),
             'driver' => 'smtp',
             'connection' => 'redis',
-            'stack' => 'emails'
+            'stack' => 'notifications'
         ],
 
     ]
 ```
 
+### Preset: Example 1
+Set a specific email address and use default queue:
+```
+php artisan mail:test --preset=example1
+
+// php artisan mail:test preset1@example.com --queue
+```
+
+### Preset: Example 2
+Use the log mail driver and emails queue
+```
+php artisan mail:test --preset=example2
+
+// php artisan mail:test --driver=log --stack=emails
+```
+
+### Preset: Example 3
+Use the log mail driver and emails queue
+```
+php artisan mail:test --preset=example3
+
+// php artisan mail:test preset3@example.com --driver=smtp --connection=redis --stack=notifications
+```
 
 ## Alternatives
 
