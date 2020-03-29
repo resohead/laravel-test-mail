@@ -81,7 +81,7 @@ class TestMailCommand extends Command
         $this->comment("A test email ($this->driver) has been sent to $this->recipient");
     }
 
-    protected function setArgumentDefaults()
+    protected function setArgumentDefaults(): void
     {
         $this->setPreset();
         $this->setRecipient();
@@ -90,6 +90,11 @@ class TestMailCommand extends Command
         $this->setStack();
     }
 
+    /**
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
     protected function getPresetValue($key, $default = null)
     {
         return $this->config->get(
@@ -98,42 +103,42 @@ class TestMailCommand extends Command
             );
     }
 
-    protected function getConfigPath()
+    protected function getConfigPath(): string
     {
         return 'mail-test.presets';
     }
 
-    protected function getConfigKeys()
+    protected function getConfigKeys(): array
     {
         return array_keys(
             $this->config->get($this->getConfigPath())
         );
     }
 
-    protected function setPreset()
+    protected function setPreset(): void
     {
         $this->preset = $this->option('preset');
     }
 
-    protected function setRecipient()
+    protected function setRecipient(): void
     {
         $this->recipient = $this->argument('recipient') ??
              $this->getPresetValue('recipient', $this->config->get('mail.from.address'));
     }
 
-    protected function setDriver()
+    protected function setDriver(): void
     {
         $this->driver = $this->option('driver') ?? 
             $this->getPresetValue('driver', $this->config->get('mail.driver'));
     }
 
-    protected function setConnection()
+    protected function setConnection(): void
     {
         $this->connection = $this->option('connection') ?? 
             $this->getPresetValue('connection', $this->config->get('queue.default'));
     }
 
-    protected function setStack()
+    protected function setStack(): void
     {
         $this->stack = $this->option('stack') ?: $this->getPresetValue('stack', 'default');
     }
@@ -143,12 +148,12 @@ class TestMailCommand extends Command
         return $this->hasQueueOptions() || $this->hasQueuePresets();
     }
 
-    protected function hasQueueOptions()
+    protected function hasQueueOptions(): bool
     {
         return $this->option('queue') || $this->option('stack') || $this->option('connection');
     }
 
-    protected function hasQueuePresets()
+    protected function hasQueuePresets(): bool
     {
         return $this->getPresetValue('queue') || $this->getPresetValue('connection') || $this->getPresetValue('stack');
     }
