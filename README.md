@@ -1,11 +1,13 @@
 # Laravel Test Mail
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/resohead/laravel-test-mail.svg?style=flat-square)](https://packagist.org/packages/resohead/laravel-test-mail)
+[![Build Status](https://scrutinizer-ci.com/g/resohead/laravel-test-mail/badges/build.png?b=master)](https://scrutinizer-ci.com/g/resohead/laravel-test-mail/build-status/master)
+[![Code Coverage](https://scrutinizer-ci.com/g/resohead/laravel-test-mail/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/resohead/laravel-test-mail/?branch=master)
 [![Quality Score](https://img.shields.io/scrutinizer/g/resohead/laravel-test-mail.svg?style=flat-square)](https://scrutinizer-ci.com/g/resohead/laravel-test-mail)
 [![Maintainability](https://api.codeclimate.com/v1/badges/ddf2b91c4d6c595d6ff0/maintainability)](https://codeclimate.com/github/resohead/laravel-test-mail/maintainability)
 [![Total Downloads](https://img.shields.io/packagist/dt/resohead/laravel-test-mail.svg?style=flat-square)](https://packagist.org/packages/resohead/laravel-test-mail)
 
-A simple package to send test emails from artisan commands in Laravel applications. Ideal for checking mail and queue configurations.
+A simple package to send test emails from artisan commands in Laravel applications. Ideal for checking mail and queue configurations without any setup.
 
 ## Installation
 
@@ -17,7 +19,7 @@ composer require resohead/laravel-test-mail
 
 The package will automatically register itself.
 
-Optionally publish the config file:
+Optionally publish the config file to enable presets:
 ```
 php artisan vendor:publish --provider="Resohead\LaravelTestMail\LaravelTestMailServiceProvider" --tag="config"
 ```
@@ -30,17 +32,17 @@ To send a test email run the following artisan command:
 php artisan mail:test
 ```
 
-By default this will use:
-- the 'from' address defined in your mail config,
-- your default mail driver,
+By default this will:
+- send to the 'from' address defined in your mail config,
+- use your default mail driver,
 - synchronous processing
 
 Alternatively you have four other options in the command signature: 
 - set the email address,
 - change the mail driver,
-- enable for queuing
+- enable for queuing (and set the queue name)
 - change the queue connection
-- select the preset
+- select a preset
 
 > Changing the mail driver and running through a queue might require the queue worker to be started/reset.
 
