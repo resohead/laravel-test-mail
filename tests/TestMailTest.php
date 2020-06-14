@@ -26,6 +26,7 @@ class TestMailTest extends TestCase
     {
         $this->defaultEmailAddress = 'recipient@example.com';
         $app['config']->set('mail.from.address', $this->defaultEmailAddress);
+        $app['config']->set('mail.driver', 'smptp');
     }
 
     protected function setUp(): void
@@ -37,7 +38,7 @@ class TestMailTest extends TestCase
 
         Mail::fake();
     }
-    
+
     /** @test */
     public function it_can_be_sent_without_any_arguments()
     {
@@ -230,7 +231,7 @@ class TestMailTest extends TestCase
 
         $this->assertStringContainsString('smtp', Artisan::output());
         $this->assertEquals(0, $exitCode);
-        
+
         $exitCode = Artisan::call($this->command, ['--driver' => 'log']);
         $this->assertStringContainsString('log', Artisan::output());
         $this->assertEquals(0, $exitCode);
@@ -257,7 +258,7 @@ class TestMailTest extends TestCase
         config(['mail.driver' => 'smtp']);
 
         $this->assertEquals('smtp', config('mail.driver'));
-        
+
         $exitCode = Artisan::call($this->command, [
                 'recipient' => 'notanemailaddress',
                 '--driver'=> '',
@@ -285,7 +286,7 @@ class TestMailTest extends TestCase
                 'stack' => 'presetStack'
             ]
         ]);
-        
+
         $exitCode = Artisan::call($this->command, [
                 '--preset' => 'test',
             ]
@@ -316,7 +317,7 @@ class TestMailTest extends TestCase
                 'recipient' => 'preset@example.com',
             ]
         ]);
-        
+
         $exitCode = Artisan::call($this->command, [
                 '--preset' => 'test',
             ]
@@ -344,7 +345,7 @@ class TestMailTest extends TestCase
                 'queue' => true,
             ]
         ]);
-        
+
         $exitCode = Artisan::call($this->command, [
                 '--preset' => 'test',
             ]
@@ -365,7 +366,7 @@ class TestMailTest extends TestCase
 
     /** @test */
     public function it_will_error_if_a_preset_does_not_exists()
-    {   
+    {
         $exitCode = Artisan::call($this->command, [
                 '--preset' => 'test',
             ]
